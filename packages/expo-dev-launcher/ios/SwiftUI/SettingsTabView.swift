@@ -34,9 +34,13 @@ struct SettingsTabView: View {
         showMenuAtLaunch
         gestures
 
-        Text(selectedGesturesInfoMessage)
-          .font(.system(size: 13))
-          .foregroundStyle(.secondary)
+        if #available(macOS 14.0, *) {
+          Text(selectedGesturesInfoMessage)
+            .font(.system(size: 13))
+            .foregroundStyle(.secondary)
+        } else {
+          // Fallback on earlier versions
+        }
 
         VStack(alignment: .leading, spacing: 8) {
           Text("system".uppercased())

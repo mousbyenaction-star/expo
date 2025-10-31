@@ -39,7 +39,7 @@ struct CrashReportView: View {
     #if !os(tvOS) && !os(macOS)
     .background(Color(.systemBackground))
     #endif
-    .navigationBarHidden(true)
+//    .navigationBarHidden(true)
   }
 
   private func copyToClipboard() {

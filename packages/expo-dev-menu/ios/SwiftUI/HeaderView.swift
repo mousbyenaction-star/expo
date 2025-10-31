@@ -14,7 +14,7 @@ struct HeaderView: View {
     HStack(spacing: 12) {
       if let iconPath = viewModel.appInfo?.appIcon,
         let image = loadAppIcon(from: iconPath) {
-        Image(uiImage: image)
+        Image(nsImage: image)
           .resizable()
           .scaledToFit()
           .frame(width: 38, height: 38)

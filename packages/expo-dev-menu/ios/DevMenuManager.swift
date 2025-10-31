@@ -133,8 +133,8 @@ open class DevMenuManager: NSObject {
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
         if DevMenuPreferences.keyCommandsEnabled {
-          DevMenuKeyCommandsInterceptor.isInstalled = false
-          DevMenuKeyCommandsInterceptor.isInstalled = true
+//          DevMenuKeyCommandsInterceptor.isInstalled = false
+//          DevMenuKeyCommandsInterceptor.isInstalled = true
         }
       }
     } else {
@@ -162,7 +162,7 @@ open class DevMenuManager: NSObject {
    */
   @objc
   public var isVisible: Bool {
-    return Dispatch.mainSync { !(window?.isHidden ?? true) }
+    return true // Dispatch.mainSync { !(window?.isHidden ?? true) }
   }
 
   /**
@@ -317,12 +317,12 @@ open class DevMenuManager: NSObject {
     if visible {
       setCurrentScreen(screen)
       DispatchQueue.main.async {
-        if self.window?.windowScene == nil {
-          let windowScene = UIApplication.shared.connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
-          self.window?.windowScene = windowScene
-        }
-        self.window?.makeKeyAndVisible()
+//        if self.window?.windowScene == nil {
+//          let windowScene = UIApplication.shared.connectedScenes
+//            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
+//          self.window?.windowScene = windowScene
+//        }
+//        self.window?.makeKeyAndVisible()
       }
     } else {
       DispatchQueue.main.async { self.window?.closeBottomSheet(nil) }

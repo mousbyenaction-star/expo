@@ -84,7 +84,7 @@
     self.shouldPreferUpdatesInterfaceSourceUrl = NO;
 
     self.dependencyProvider = [RCTAppDependencyProvider new];
-    self.reactNativeFactory = [[EXDevLauncherReactNativeFactory alloc] initWithDelegate:self releaseLevel:[self getReactNativeReleaseLevel]];
+    self.reactNativeFactory = [[EXDevLauncherReactNativeFactory alloc] initWithDelegate:self];
     self.devMenuDelegate = [[DevLauncherDevMenuDelegate alloc] initWithController:self];
     [[DevMenuManager shared] setDelegate:self.devMenuDelegate];
   }
@@ -103,31 +103,31 @@
   return [_recentlyOpenedAppsRegistry clearRegistry];
 }
 
-- (NSDictionary<UIApplicationLaunchOptionsKey, NSObject*> *)getLaunchOptions;
-{
-  NSMutableDictionary *launchOptions = [self.launchOptions ?: @{} mutableCopy];
-  NSURL *deepLink = [self.pendingDeepLinkRegistry consumePendingDeepLink];
-
-  if (deepLink) {
-    // Passes pending deep link to initialURL if any
-    launchOptions[UIApplicationLaunchOptionsURLKey] = deepLink;
-  } else if (launchOptions[UIApplicationLaunchOptionsURLKey] && [EXDevLauncherURLHelper isDevLauncherURL:launchOptions[UIApplicationLaunchOptionsURLKey]]) {
-    // Strips initialURL if it is from myapp://expo-development-client/?url=...
-    // That would make dev-launcher acts like a normal app.
-    launchOptions[UIApplicationLaunchOptionsURLKey] = nil;
-  }
-
-  if ([launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey][UIApplicationLaunchOptionsUserActivityTypeKey] isEqualToString:NSUserActivityTypeBrowsingWeb]) {
-    // Strips universal launch link if it is from https://expo-development-client/?url=...
-    // That would make dev-launcher acts like a normal app, though this case should rarely happen.
-    NSUserActivity *userActivity = launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey][@"UIApplicationLaunchOptionsUserActivityKey"];
-    if (userActivity.webpageURL && [EXDevLauncherURLHelper isDevLauncherURL:userActivity.webpageURL]) {
-      userActivity.webpageURL = nil;
-    }
-  }
-
-  return launchOptions;
-}
+//- (NSDictionary<UIApplicationLaunchOptionsKey, NSObject*> *)getLaunchOptions;
+//{
+//  NSMutableDictionary *launchOptions = [self.launchOptions ?: @{} mutableCopy];
+//  NSURL *deepLink = [self.pendingDeepLinkRegistry consumePendingDeepLink];
+//
+//  if (deepLink) {
+//    // Passes pending deep link to initialURL if any
+//    launchOptions[UIApplicationLaunchOptionsURLKey] = deepLink;
+//  } else if (launchOptions[UIApplicationLaunchOptionsURLKey] && [EXDevLauncherURLHelper isDevLauncherURL:launchOptions[UIApplicationLaunchOptionsURLKey]]) {
+//    // Strips initialURL if it is from myapp://expo-development-client/?url=...
+//    // That would make dev-launcher acts like a normal app.
+//    launchOptions[UIApplicationLaunchOptionsURLKey] = nil;
+//  }
+//
+//  if ([launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey][UIApplicationLaunchOptionsUserActivityTypeKey] isEqualToString:NSUserActivityTypeBrowsingWeb]) {
+//    // Strips universal launch link if it is from https://expo-development-client/?url=...
+//    // That would make dev-launcher acts like a normal app, though this case should rarely happen.
+//    NSUserActivity *userActivity = launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey][@"UIApplicationLaunchOptionsUserActivityKey"];
+//    if (userActivity.webpageURL && [EXDevLauncherURLHelper isDevLauncherURL:userActivity.webpageURL]) {
+//      userActivity.webpageURL = nil;
+//    }
+//  }
+//
+//  return launchOptions;
+//}
 
 - (EXManifestsManifest *)appManifest
 {
@@ -184,7 +184,7 @@
 
   NSNumber *devClientTryToLaunchLastBundleValue = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"DEV_CLIENT_TRY_TO_LAUNCH_LAST_BUNDLE"];
   BOOL shouldTryToLaunchLastOpenedBundle = (devClientTryToLaunchLastBundleValue != nil) ? [devClientTryToLaunchLastBundleValue boolValue] : YES;
-  if (_lastOpenedAppUrl != nil && shouldTryToLaunchLastOpenedBundle) {
+  if (_lastOpenedAppUrl != nil && shouldTryToLaunchLastOpenedBundle && false) {
     // When launch to the last opened url, the previous url could be unreachable because of LAN IP changed.
     // We use a shorter timeout to prevent black screen when loading for an unreachable server.
     NSTimeInterval requestTimeout = 10.0;
@@ -203,7 +203,7 @@
 
   self.networkInterceptor = nil;
 
-  [self _applyUserInterfaceStyle:UIUserInterfaceStyleUnspecified];
+//  [self _applyUserInterfaceStyle:UIUserInterfaceStyleUnspecified];
 
   [self _removeInitModuleObserver];
   // Reset app react host
@@ -454,16 +454,16 @@
     self.networkInterceptor = [[EXDevLauncherNetworkInterceptor alloc] initWithBundleUrl:bundleUrl];
 #endif
 
-    UIUserInterfaceStyle userInterfaceStyle = [EXDevLauncherManifestHelper exportManifestUserInterfaceStyle:manifest.userInterfaceStyle];
-    [self _applyUserInterfaceStyle:userInterfaceStyle];
+//    UIUserInterfaceStyle userInterfaceStyle = [EXDevLauncherManifestHelper exportManifestUserInterfaceStyle:manifest.userInterfaceStyle];
+//    [self _applyUserInterfaceStyle:userInterfaceStyle];
 
     // Fix for the community react-native-appearance.
     // RNC appearance checks the global trait collection and doesn't have another way to override the user interface.
     // So we swap `currentTraitCollection` with one from the root view controller.
     // Note that the root view controller will have the correct value of `userInterfaceStyle`.
-    if (userInterfaceStyle != UIUserInterfaceStyleUnspecified) {
-      UITraitCollection.currentTraitCollection = [self.window.rootViewController.traitCollection copy];
-    }
+//    if (userInterfaceStyle != UIUserInterfaceStyleUnspecified) {
+//      UITraitCollection.currentTraitCollection = [self.window.rootViewController.traitCollection copy];
+//    }
 
     [self _addInitModuleObserver];
 
@@ -472,7 +472,7 @@
     [self setDevMenuAppBridge];
 
     if (backgroundColor) {
-      self.window.rootViewController.view.backgroundColor = backgroundColor;
+//      self.window.rootViewController.view.backgroundColor = backgroundColor;
       self.window.backgroundColor = backgroundColor;
     }
   });
@@ -496,27 +496,27 @@
 - (void)onAppContentDidAppear
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSArray<UIView *> *views = [[[self->_window rootViewController] view] subviews];
-    for (UIView *view in views) {
-      if ([NSStringFromClass([view class]) containsString:@"SplashScreen"]) {
-        [view removeFromSuperview];
-      }
-    }
+//    NSArray<UIView *> *views = [[[self->_window rootViewController] view] subviews];
+//    for (UIView *view in views) {
+//      if ([NSStringFromClass([view class]) containsString:@"SplashScreen"]) {
+//        [view removeFromSuperview];
+//      }
+//    }
   });
 }
 
-- (void)_applyUserInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
-{
-  NSString *colorSchema = nil;
-  if (userInterfaceStyle == UIUserInterfaceStyleDark) {
-    colorSchema = @"dark";
-  } else if (userInterfaceStyle == UIUserInterfaceStyleLight) {
-    colorSchema = @"light";
-  }
-
-  // change RN appearance
-  RCTOverrideAppearancePreference(colorSchema);
-}
+//- (void)_applyUserInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
+//{
+//  NSString *colorSchema = nil;
+//  if (userInterfaceStyle == UIUserInterfaceStyleDark) {
+//    colorSchema = @"dark";
+//  } else if (userInterfaceStyle == UIUserInterfaceStyleLight) {
+//    colorSchema = @"light";
+//  }
+//
+//  // change RN appearance
+//  RCTOverrideAppearancePreference(colorSchema);
+//}
 
 - (void)_addInitModuleObserver {
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didInitializeModule:) name:RCTDidInitializeModuleNotification object:nil];
@@ -534,10 +534,10 @@
     // and this needs to happen after the module has been initialized.
     // RCTDevMenu registers its commands here: https://github.com/facebook/react-native/blob/f3e8ea9c2910b33db17001e98b96720b07dce0b3/React/CoreModules/RCTDevMenu.mm#L130-L135
     // expo-dev-menu registers its commands here: https://github.com/expo/expo/blob/6da15324ff0b4a9cb24055e9815b8aa11f0ac3af/packages/expo-dev-menu/ios/Interceptors/DevMenuKeyCommandsInterceptor.swift#L27-L29
-    [[RCTKeyCommands sharedInstance] unregisterKeyCommandWithInput:@"d"
-                                                     modifierFlags:UIKeyModifierCommand];
-    [[RCTKeyCommands sharedInstance] unregisterKeyCommandWithInput:@"r"
-                                                    modifierFlags:UIKeyModifierCommand];
+//    [[RCTKeyCommands sharedInstance] unregisterKeyCommandWithInput:@"d"
+//                                                     modifierFlags:UIKeyModifierCommand];
+//    [[RCTKeyCommands sharedInstance] unregisterKeyCommandWithInput:@"r"
+//                                                    modifierFlags:UIKeyModifierCommand];
   }
 }
 
@@ -605,29 +605,29 @@
   return appVersion;
 }
 
--(RCTReleaseLevel)getReactNativeReleaseLevel
-{
-//  @TODO: Read this value from the main react-native factory instance on 0.82
-  NSString *releaseLevelString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ReactNativeReleaseLevel"];
-  RCTReleaseLevel releaseLevel = Stable;
-  if ([releaseLevelString isKindOfClass:[NSString class]]) {
-    NSString *lower = [releaseLevelString lowercaseString];
-    if ([lower isEqualToString:@"canary"]) {
-      releaseLevel = Canary;
-    } else if ([lower isEqualToString:@"experimental"]) {
-      releaseLevel = Experimental;
-    } else if ([lower isEqualToString:@"stable"]) {
-      releaseLevel = Stable;
-    }
-  }
-
-  return releaseLevel;
-}
+//-(RCTReleaseLevel)getReactNativeReleaseLevel
+//{
+////  @TODO: Read this value from the main react-native factory instance on 0.82
+//  NSString *releaseLevelString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ReactNativeReleaseLevel"];
+//  RCTReleaseLevel releaseLevel = Stable;
+//  if ([releaseLevelString isKindOfClass:[NSString class]]) {
+//    NSString *lower = [releaseLevelString lowercaseString];
+//    if ([lower isEqualToString:@"canary"]) {
+//      releaseLevel = Canary;
+//    } else if ([lower isEqualToString:@"experimental"]) {
+//      releaseLevel = Experimental;
+//    } else if ([lower isEqualToString:@"stable"]) {
+//      releaseLevel = Stable;
+//    }
+//  }
+//
+//  return releaseLevel;
+//}
 
 -(void)copyToClipboard:(NSString *)content {
 #if !TARGET_OS_TV
-  UIPasteboard *clipboard = [UIPasteboard generalPasteboard];
-  clipboard.string = (content ?: @"");
+//  UIPasteboard *clipboard = [UIPasteboard generalPasteboard];
+//  clipboard.string = (content ?: @"");
 #endif
 }
 

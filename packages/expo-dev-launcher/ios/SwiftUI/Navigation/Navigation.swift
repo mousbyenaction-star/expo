@@ -30,7 +30,7 @@ struct DevLauncherNavigationHeader: View {
       HStack(spacing: 12) {
         if let path = viewModel.buildInfo["appIcon"] as? String,
           let appIcon = loadAppIcon(from: path) {
-          Image(uiImage: appIcon)
+          Image(nsImage: appIcon)
             .resizable()
             .scaledToFit()
             .frame(width: 32, height: 32)

@@ -24,7 +24,7 @@ struct Avatar<Content: View, Placeholder: View>: View {
   var body: some View {
     Group {
       if let image = image {
-        content(Image(uiImage: image))
+        content(Image(nsImage: image))
       } else {
         placeholder()
       }

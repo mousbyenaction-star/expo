@@ -14,58 +14,62 @@ public struct DevLauncherRootView: View {
   }
 
   public var body: some View {
-    NavigationView {
-      TabView {
-        HomeTabView()
-          .tabItem {
-            Image(systemName: "house.fill")
-            Text("Home")
-          }
+    if #available(macOS 13.0, *) {
+      NavigationStack {
+        TabView {
+          HomeTabView()
+            .tabItem {
+              Image(systemName: "house.fill")
+              Text("Home")
+            }
 
-        UpdatesTabView()
-          .tabItem {
-            Image(systemName: "arrow.2.circlepath")
-            Text("Updates")
-          }
+          UpdatesTabView()
+            .tabItem {
+              Image(systemName: "arrow.2.circlepath")
+              Text("Updates")
+            }
 
-        SettingsTabView()
-          .tabItem {
-            Image(systemName: "gearshape")
-            Text("Settings")
-          }
-      }
-      .onAppear {
-        DevLauncherTabBarManager.shared.setCustomAppearance()
-      }
-      .onDisappear {
-        DevLauncherTabBarManager.shared.restoreOriginalAppearance()
-      }
-      .navigationBarHidden(true)
-      .environmentObject(viewModel)
-      .environmentObject(DevLauncherNavigation(showingUserProfile: $showingUserProfile))
-    }
-    .navigationViewStyle(.stack)
-    .sheet(isPresented: $showingUserProfile) {
-      AccountSheet()
+          SettingsTabView()
+            .tabItem {
+              Image(systemName: "gearshape")
+              Text("Settings")
+            }
+        }
+        .onAppear {
+          DevLauncherTabBarManager.shared.setCustomAppearance()
+        }
+        .onDisappear {
+          DevLauncherTabBarManager.shared.restoreOriginalAppearance()
+        }
+        //      .navigationBarHidden(true)
         .environmentObject(viewModel)
-    }
-    .fullScreenCover(isPresented: $viewModel.showingCrashReport) {
-      if let error = viewModel.currentError {
-        CrashReportView(
-          error: error,
-          errorInstance: viewModel.storedCrashInstance,
-          onDismiss: {
-            viewModel.dismissCrashReport()
-          }
-        )
+        .environmentObject(DevLauncherNavigation(showingUserProfile: $showingUserProfile))
       }
-    }
-    .alert("Error loading app", isPresented: $viewModel.showingErrorAlert) {
-      Button("OK") {
-        viewModel.dismissErrorAlert()
+      //      .navigationViewStyle(.columns)
+      .sheet(isPresented: $showingUserProfile) {
+        AccountSheet()
+          .environmentObject(viewModel)
       }
-    } message: {
-      Text(viewModel.errorAlertMessage)
+      .sheet(isPresented: $viewModel.showingCrashReport) {
+        if let error = viewModel.currentError {
+          CrashReportView(
+            error: error,
+            errorInstance: viewModel.storedCrashInstance,
+            onDismiss: {
+              viewModel.dismissCrashReport()
+            }
+          )
+        }
+      }
+      .alert("Error loading app", isPresented: $viewModel.showingErrorAlert) {
+        Button("OK") {
+          viewModel.dismissErrorAlert()
+        }
+      } message: {
+        Text(viewModel.errorAlertMessage)
+      }
+    } else {
+      // Fallback on earlier versions
     }
   }
 }

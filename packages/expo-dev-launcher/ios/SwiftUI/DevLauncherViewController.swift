@@ -23,11 +23,11 @@ import ExpoModulesCore
   }
 
   private func setupViewController() {
-    view.backgroundColor = UIColor.white
+//    view.backgroundColor = UIColor.white
 
     let rootView = DevLauncherRootView(viewModel: viewModel)
     hostingController = UIHostingController(rootView: rootView)
-    hostingController?.view.backgroundColor = UIColor.clear
+//    hostingController?.view.backgroundColor = UIColor.clear
   }
 
   @objc public func resetHostingController() {
@@ -48,11 +48,11 @@ import ExpoModulesCore
     addChild(hostingController)
     view.addSubview(hostingController.view)
 
-    hostingController.view.frame = view.bounds
-    hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    hostingController.view.frame = view.frame
+    hostingController.view.autoresizingMask = [.width, .height]
 
-    hostingController.didMove(toParent: self)
-    navigationController?.setNavigationBarHidden(true, animated: false)
+//    hostingController.didMove(toParent: self)
+//    navigationController?.setNavigationBarHidden(true, animated: false)
   }
 
 #if os(iOS) || os(tvOS)

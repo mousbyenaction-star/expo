@@ -29,7 +29,7 @@ struct ErrorView: View {
       actions
     }
     .background(Color.expoSystemBackground)
-    .navigationBarHidden(true)
+//    .navigationBarHidden(true)
   }
 
   private var stackTrace: some View {
