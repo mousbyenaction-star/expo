@@ -219,7 +219,7 @@ public class AppController: NSObject {
       // which expo-dev-client can access.
       let devLauncherController = initializeAsDevLauncherWithoutStarting()
       _sharedInstance = devLauncherController
-      UpdatesControllerRegistry.sharedInstance.controller = devLauncherController
+      UpdatesControllerRegistry.sharedInstance.controller = devLauncherController as (any UpdatesDevLauncherInterface)
       #else
       _sharedInstance = DisabledAppController(error: nil)
       #endif
@@ -273,6 +273,7 @@ public class AppController: NSObject {
         let directory = try initializeUpdatesDirectory()
         try initializeUpdatesDatabase(updatesDatabase: updatesDatabase, inUpdatesDirectory: directory, logger: logger)
         _sharedInstance = EnabledAppController(config: config, database: updatesDatabase, updatesDirectory: directory)
+        UpdatesControllerRegistry.sharedInstance.controller = _sharedInstance as! any UpdatesEnabledInterface as (any UpdatesEnabledInterface)
       } catch {
         let cause = UpdatesError.appControllerInitializationError(cause: error)
         logger.error(

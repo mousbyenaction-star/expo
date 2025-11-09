@@ -17,9 +17,31 @@ public typealias UpdatesManifestBlock = (_ manifest: [String: Any]) -> Bool
 /**
  * Protocol for modules that depend on expo-updates for loading production updates but do not want
  * to depend on expo-updates or delegate control to the singleton EXUpdatesAppController.
+ *
+ * All updates controllers implement this protocol
  */
-@objc(EXUpdatesExternalInterface)
-public protocol UpdatesExternalInterface {
+@objc(EXUpdatesInterface)
+public protocol UpdatesInterface {
+  @objc var runtimeVersion: String? { get }
+  @objc var updateURL: URL? { get }
+  @objc var isEnabled: Bool { get }
+}
+
+/**
+ * Implemented only by the enabled updates controller
+ */
+@objc(EXUpdatesEnabledInterface)
+public protocol UpdatesEnabledInterface: UpdatesInterface {
+  @objc var launchedUpdateId: UUID? { get }
+  @objc var embeddedUpdateId: UUID? { get }
+}
+
+/**
+ *
+ * Implemented only by the dev launcher updates controller.
+ */
+@objc(EXUpdatesDevLauncherInterface)
+public protocol UpdatesDevLauncherInterface: UpdatesInterface {
   @objc weak var updatesExternalInterfaceDelegate: (any UpdatesExternalInterfaceDelegate)? { get set }
   @objc var launchAssetURL: URL? { get }
 
@@ -44,16 +66,5 @@ public protocol UpdatesExternalInterface {
  */
 @objc(EXUpdatesExternalInterfaceDelegate)
 public protocol UpdatesExternalInterfaceDelegate {
-  @objc func updatesExternalInterfaceDidRequestRelaunch(_ updatesExternalInterface: UpdatesExternalInterface)
-}
-
-/**
- * Protocol for use by the expo-app-metrics library
- */
-@objc(EXUpdatesExternalMetricsInterface)
-public protocol UpdatesExternalMetricsInterface {
-  @objc var runtimeVersion: String? { get }
-  @objc var updateURL: URL? { get }
-  @objc var launchedUpdateId: UUID? { get }
-  @objc var embeddedUpdateId: UUID? { get }
+  @objc func updatesExternalInterfaceDidRequestRelaunch(_ updatesExternalInterface: UpdatesDevLauncherInterface)
 }
