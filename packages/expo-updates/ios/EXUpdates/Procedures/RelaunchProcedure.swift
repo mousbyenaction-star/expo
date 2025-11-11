@@ -2,6 +2,7 @@
 
 import React
 import ExpoModulesCore
+import EXUpdatesInterface
 
 final class RelaunchProcedure: StateMachineProcedure {
   private let database: UpdatesDatabase

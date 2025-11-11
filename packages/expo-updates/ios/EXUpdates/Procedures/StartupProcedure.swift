@@ -1,5 +1,7 @@
 //  Copyright © 2019 650 Industries. All rights reserved.
 
+import EXUpdatesInterface
+
 internal protocol StartupProcedureDelegate: AnyObject {
   func startupProcedureDidLaunch(_ startupProcedure: StartupProcedure)
   func startupProcedure(_ startupProcedure: StartupProcedure, errorRecoveryDidRequestRelaunchWithCompletion completion: @escaping (Error?, Bool) -> Void)

@@ -53,8 +53,8 @@ public final class DevLauncherAppController: NSObject, InternalAppControllerInte
 
   private let logger = UpdatesLogger()
 
-  public weak var delegate: AppControllerDelegate?
-  public weak var updatesExternalInterfaceDelegate: (any UpdatesExternalInterfaceDelegate)?
+  public var delegate: AppControllerDelegate?
+  public var updatesExternalInterfaceDelegate: (any UpdatesExternalInterfaceDelegate)?
 
   public func launchAssetUrl() -> URL? {
     return launcher?.launchAssetUrl

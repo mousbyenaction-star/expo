@@ -2,6 +2,7 @@
 
 import React
 import ExpoModulesCore
+import EXUpdatesInterface
 
 final class RecreateReactContextProcedure: StateMachineProcedure {
   private let triggerReloadCommandListenersReason: String

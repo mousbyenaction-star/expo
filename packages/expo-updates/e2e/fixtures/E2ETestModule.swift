@@ -1,9 +1,14 @@
 // Copyright 2019 650 Industries. All rights reserved.
 
 import ExpoModulesCore
+import EXUpdatesInterface
 
-public final class E2ETestModule: Module {
+public final class E2ETestModule: Module, UpdatesStateChangeListener {
   private let methodQueue = DispatchQueue(label: "expo.modules.EXUpdatesQueue")
+
+  public func updatesStateDidChange(_ event: UpdatesStateEvent) {
+    NSLog("E2ETestModule: updatesStateDidChange: \(event)")
+  }
 
   public required init(appContext: AppContext) {
     super.init(appContext: appContext)
@@ -11,6 +16,18 @@ public final class E2ETestModule: Module {
 
   public func definition() -> ModuleDefinition {
     Name("ExpoUpdatesE2ETest")
+
+    OnCreate {
+      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? UpdatesEnabledInterface {
+        controller.stateChangeListener = self
+      }
+    }
+
+    OnDestroy {
+      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? UpdatesEnabledInterface {
+        controller.stateChangeListener = nil
+      }
+    }
 
     AsyncFunction("readInternalAssetsFolderAsync") { (promise: Promise) in
       guard let assetsFolder = AppController.sharedInstance.updatesDirectory else {

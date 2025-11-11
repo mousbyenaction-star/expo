@@ -8,6 +8,8 @@ import EXUpdatesInterface
  * Updates controller for applications that have updates enabled and properly-configured.
  */
 public class EnabledAppController: InternalAppControllerInterface, UpdatesEnabledInterface, StartupProcedureDelegate {
+  public var stateChangeListener: (any UpdatesStateChangeListener)?
+  
   public weak var delegate: AppControllerDelegate?
   public var reloadScreenManager: Reloadable? = ReloadScreenManager()
 

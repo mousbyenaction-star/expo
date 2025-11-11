@@ -1,5 +1,7 @@
 //  Copyright © 2019 650 Industries. All rights reserved.
 
+import EXUpdatesInterface
+
 internal class StateMachineProcedureContext {
   private let processStateEventCallback: (_ event: UpdatesStateEvent) -> Void
   private let getCurrentStateCallback: () -> UpdatesStateValue

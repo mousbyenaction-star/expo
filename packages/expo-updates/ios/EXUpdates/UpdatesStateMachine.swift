@@ -3,6 +3,7 @@
 // swiftlint:disable no_grouping_extension
 
 import Foundation
+import EXUpdatesInterface
 
 // MARK: - Enums
 
@@ -17,27 +18,7 @@ internal enum UpdatesStateValue: String, CaseIterable {
 }
 
 // MARK: - Data structures
-
-/**
- All the possible types of events that can be sent to the machine. Each event
- will cause the machine to transition to a new state.
- */
-internal enum UpdatesStateEvent {
-  case startStartup
-  case endStartup
-  case check
-  case checkCompleteUnavailable
-  case checkCompleteWithUpdate(manifest: [String: Any])
-  case checkCompleteWithRollback(rollbackCommitTime: Date)
-  case checkError(errorMessage: String)
-  case download
-  case downloadComplete
-  case downloadCompleteWithUpdate(manifest: [String: Any])
-  case downloadCompleteWithRollback
-  case downloadError(errorMessage: String)
-  case downloadProgress(progress: Double)
-  case restart
-
+extension UpdatesStateEvent {
   internal enum InternalType {
     case startStartup
     case endStartup
@@ -84,6 +65,7 @@ internal enum UpdatesStateEvent {
       return .restart
     }
   }
+
 }
 
 /**
@@ -317,6 +299,10 @@ internal class UpdatesStateMachine {
       // Only change context if transition succeeds
       context = reducedContext(context, event)
       logger.info(message: "Updates state change: state = \(state), event = \(event.type), context = \(context)")
+      // Notify the controller state change listener
+      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? EnabledAppController {
+        controller.stateChangeListener?.updatesStateDidChange(event)
+      }
       sendContextToJS()
     }
   }

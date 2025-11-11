@@ -30,10 +30,10 @@ public protocol UpdatesInterface {
 /**
  * Implemented only by the enabled updates controller
  */
-@objc(EXUpdatesEnabledInterface)
 public protocol UpdatesEnabledInterface: UpdatesInterface {
-  @objc var launchedUpdateId: UUID? { get }
-  @objc var embeddedUpdateId: UUID? { get }
+  var launchedUpdateId: UUID? { get }
+  var embeddedUpdateId: UUID? { get }
+  var stateChangeListener: (any UpdatesStateChangeListener)? { get set }
 }
 
 /**
@@ -67,4 +67,11 @@ public protocol UpdatesDevLauncherInterface: UpdatesInterface {
 @objc(EXUpdatesExternalInterfaceDelegate)
 public protocol UpdatesExternalInterfaceDelegate {
   @objc func updatesExternalInterfaceDidRequestRelaunch(_ updatesExternalInterface: UpdatesDevLauncherInterface)
+}
+
+/**
+ * Subclasses of this class can listen to state change events
+ */
+public protocol UpdatesStateChangeListener {
+  func updatesStateDidChange(_ event: UpdatesStateEvent)
 }
