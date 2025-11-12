@@ -14,6 +14,8 @@
 
 ### 💡 Others
 
+- [Android] Add `android:maxSdkVersion` annotation to  `READ_EXTERNAL_STORAGE` and `WRITE_EXTERNAL_STORAGE` permissions
+
 ## 19.0.17 - 2025-10-09
 
 ### 🐛 Bug fixes

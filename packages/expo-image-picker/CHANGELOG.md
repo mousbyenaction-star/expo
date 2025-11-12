@@ -15,6 +15,8 @@
 
 ### 💡 Others
 
+- [Android] Add `android:maxSdkVersion` annotation to  `READ_EXTERNAL_STORAGE` and `WRITE_EXTERNAL_STORAGE` permissions.
+
 ## 17.0.8 — 2025-09-11
 
 _This version does not introduce any user-facing changes._
