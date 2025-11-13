@@ -5,6 +5,7 @@ import EXUpdatesInterface
 
 public final class E2ETestModule: Module, UpdatesStateChangeListener {
   private let methodQueue = DispatchQueue(label: "expo.modules.EXUpdatesQueue")
+  private var updatesController: (any UpdatesE2ETestingInterface)?
 
   public func updatesStateDidChange(_ event: UpdatesStateEvent) {
     NSLog("E2ETestModule: updatesStateDidChange: \(event)")
@@ -18,68 +19,25 @@ public final class E2ETestModule: Module, UpdatesStateChangeListener {
     Name("ExpoUpdatesE2ETest")
 
     OnCreate {
-      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? UpdatesEnabledInterface {
+      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? UpdatesE2ETestingInterface {
+        updatesController = controller
         controller.stateChangeListener = self
       }
     }
 
     OnDestroy {
-      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? UpdatesEnabledInterface {
+      updatesController = nil
+      if let controller = UpdatesControllerRegistry.sharedInstance.controller as? UpdatesE2ETestingInterface {
         controller.stateChangeListener = nil
       }
     }
 
     AsyncFunction("readInternalAssetsFolderAsync") { (promise: Promise) in
-      guard let assetsFolder = AppController.sharedInstance.updatesDirectory else {
-        promise.reject("ERR_UPDATES_E2E_READ", "No updatesDirectory initialized")
-        return
-      }
-
-      FileDownloader.assetFilesQueue.async {
-        var contents: [String]
-        do {
-          contents = try FileManager.default.contentsOfDirectory(atPath: assetsFolder.path)
-        } catch {
-          promise.reject("ERR_UPDATES_E2E_READ", error.localizedDescription)
-          return
-        }
-        let count = contents.filter { file in
-          return !(file.hasPrefix("expo-") && (file.hasSuffix(".db") || file.contains(".db-")))
-        }.count
-        promise.resolve(count)
-      }
+      updatesController?.getInternalDbAssetCountAsync(promise)
     }
 
     AsyncFunction("clearInternalAssetsFolderAsync") { (promise: Promise) in
-      guard let assetsFolder = AppController.sharedInstance.updatesDirectory else {
-        promise.reject("ERR_UPDATES_E2E_CLEAR", "No updatesDirectory initialized")
-        return
-      }
-
-      FileDownloader.assetFilesQueue.async {
-        var contents: [String]
-        do {
-          contents = try FileManager.default.contentsOfDirectory(atPath: assetsFolder.path)
-        } catch {
-          promise.reject("ERR_UPDATES_E2E_CLEAR", error.localizedDescription)
-          return
-        }
-        let files = contents.filter { file in
-          return !(file.hasPrefix("expo-") && (file.hasSuffix(".db") || file.contains(".db-")))
-        }
-
-        for file in files {
-          let filePath = assetsFolder.appendingPathComponent(file).path
-          do {
-            try FileManager.default.removeItem(atPath: filePath)
-          } catch {
-            promise.reject("ERR_UPDATES_E2E_CLEAR", error.localizedDescription)
-            return
-          }
-        }
-
-        promise.resolve(nil)
-      }
+      updatesController?.clearInternalDbAssetsAsync(promise)
     }
   }
 }

@@ -37,6 +37,15 @@ public protocol UpdatesEnabledInterface: UpdatesInterface {
 }
 
 /**
+ * Implemented only by the enabled updates controller
+ * Used only in Expo's E2E testing
+ */
+public protocol UpdatesE2ETestingInterface: UpdatesEnabledInterface {
+  func getInternalDbAssetCountAsync(_ promise: Promise)
+  func clearInternalDbAssetsAsync(_ promise: Promise)
+}
+
+/**
  *
  * Implemented only by the dev launcher updates controller.
  */
@@ -69,9 +78,6 @@ public protocol UpdatesExternalInterfaceDelegate {
   @objc func updatesExternalInterfaceDidRequestRelaunch(_ updatesExternalInterface: UpdatesDevLauncherInterface)
 }
 
-/**
- * Subclasses of this class can listen to state change events
- */
 public protocol UpdatesStateChangeListener {
   func updatesStateDidChange(_ event: UpdatesStateEvent)
 }

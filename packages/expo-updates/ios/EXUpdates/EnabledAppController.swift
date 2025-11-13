@@ -7,9 +7,7 @@ import EXUpdatesInterface
 /**
  * Updates controller for applications that have updates enabled and properly-configured.
  */
-public class EnabledAppController: InternalAppControllerInterface, UpdatesEnabledInterface, StartupProcedureDelegate {
-  public var stateChangeListener: (any UpdatesStateChangeListener)?
-  
+public class EnabledAppController: InternalAppControllerInterface, UpdatesEnabledInterface, UpdatesE2ETestingInterface, StartupProcedureDelegate {
   public weak var delegate: AppControllerDelegate?
   public var reloadScreenManager: Reloadable? = ReloadScreenManager()
 
@@ -162,6 +160,8 @@ public class EnabledAppController: InternalAppControllerInterface, UpdatesEnable
 
   // MARK: - UpdatesEnabledInterface
 
+  public var stateChangeListener: (any UpdatesStateChangeListener)?
+
   public var runtimeVersion: String? {
     return config.runtimeVersion
   }
@@ -179,6 +179,59 @@ public class EnabledAppController: InternalAppControllerInterface, UpdatesEnable
   }
 
   public var isEnabled: Bool = true
+
+  public func getInternalDbAssetCountAsync(_ promise: Promise) {
+    guard let assetsFolder = updatesDirectory else {
+      promise.reject("ERR_UPDATES_E2E_READ", "No updatesDirectory initialized")
+      return
+    }
+
+    FileDownloader.assetFilesQueue.async {
+      var contents: [String]
+      do {
+        contents = try FileManager.default.contentsOfDirectory(atPath: assetsFolder.path)
+      } catch {
+        promise.reject("ERR_UPDATES_E2E_READ", error.localizedDescription)
+        return
+      }
+      let count = contents.filter { file in
+        return !(file.hasPrefix("expo-") && (file.hasSuffix(".db") || file.contains(".db-")))
+      }.count
+      promise.resolve(count)
+    }
+  }
+
+  public func clearInternalDbAssetsAsync(_ promise: Promise) {
+    guard let assetsFolder = updatesDirectory else {
+      promise.reject("ERR_UPDATES_E2E_CLEAR", "No updatesDirectory initialized")
+      return
+    }
+
+    FileDownloader.assetFilesQueue.async {
+      var contents: [String]
+      do {
+        contents = try FileManager.default.contentsOfDirectory(atPath: assetsFolder.path)
+      } catch {
+        promise.reject("ERR_UPDATES_E2E_CLEAR", error.localizedDescription)
+        return
+      }
+      let files = contents.filter { file in
+        return !(file.hasPrefix("expo-") && (file.hasSuffix(".db") || file.contains(".db-")))
+      }
+
+      for file in files {
+        let filePath = assetsFolder.appendingPathComponent(file).path
+        do {
+          try FileManager.default.removeItem(atPath: filePath)
+        } catch {
+          promise.reject("ERR_UPDATES_E2E_CLEAR", error.localizedDescription)
+          return
+        }
+      }
+
+      promise.resolve(nil)
+    }
+  }
 
   // MARK: - Internal
 
