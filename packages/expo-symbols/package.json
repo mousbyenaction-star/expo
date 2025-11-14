@@ -15,7 +15,14 @@
   },
   "exports": {
     ".": "./build/index.js",
-    "./androidWeights/*": "./build/android/weights/*/index.js"
+    "./androidWeights/*": {
+      "default": "./build/android/weights/*/index.js",
+      "types": "./build/android/weights/*/index.d.ts"
+    },
+    "./internal": {
+      "default": "./build/internal.js",
+      "types": "./build/internal.d.ts"
+    }
   },
   "keywords": [
     "react-native",
